@@ -1,27 +1,30 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import './App.css';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import IssueList from './component/issue-list/IssueList';
+import IssueDetails from './component/issue-details/IssueDetails';
+import AuthenticatedRoute from './route-guards/AuthenticatedRoute';
+import AuthorizedRoute from './route-guards/AuthorizedRoute';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Router>
+        <Switch>
+          <Route path="/public" exact render={() => <div>I'm the public component!</div>} />
+          <AuthenticatedRoute>
+            <Route path="/issues" exact component={IssueList} />
+            <AuthorizedRoute requiredAccessLevel={1}>
+              <Route path="/issues/:id" exact component={IssueDetails} />
+            </AuthorizedRoute>
+          </AuthenticatedRoute>
+
+          <Route render={() => <div>Not Found</div>} />
+        </Switch>
+
+      </Router>
     );
   }
 }
@@ -36,4 +39,4 @@ const mapDispatchToProps = dispatch => {
 
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
